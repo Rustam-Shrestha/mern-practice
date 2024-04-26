@@ -1,6 +1,10 @@
 const express = require("express");
 const app = express()
-
+const cors = require("cors")
+app.use(cors({
+    // give data only to the following prortocol domain and port combination not others
+    origin:"http://localhost:5173"
+}))
 const { connectDatabase } = require("./database/database")
 const Blog = require("./model/blogModel")
 
@@ -26,16 +30,16 @@ app.get("/allblogs", async function (rq, rs) {
         // equivalent to select * from Blog
         const blogList = await Blog.find()
         if (blogList.length < 1) {
-            res.json({
+            rs.status(404).json({
                 status: 200,
                 message: "no blogs added yet"
             })
         } else {
 
-            rs.json({
+            rs.status(200).json({
                 status: 200,
                 message: "welcome to all blogs",
-                data: blogList
+                blogs: blogList
             })
         }
     } catch (error) {
@@ -53,7 +57,7 @@ app.get("/allblogs/:id", async function (rq, rs) {
         // thing as above to find blog b it
         // reference as id
         // const blogSel = await Blog.findById(blogId)
-        rs.status(200).json({ message: "blog fetched", data: blogSel })
+        rs.status(200).json({ message: "blog fetched", blogs: blogSel })
     } catch (error) {
         rs.status(400).json("did not have  blog");
     }
